@@ -1,0 +1,8 @@
+{{- if .Values.ingress.enabled }}
+http://{{ .Values.ingress.host }}
+{{- end }}
+
+Add a config map with the name {{ .Values.config.name }}
+TZ: "US/Central"
+PUID: "1000"
+PGID: "1000"

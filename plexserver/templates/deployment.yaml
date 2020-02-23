@@ -1,0 +1,74 @@
+{{- with .Values }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ .name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          {{- with .image }}
+          image: {{ .repository }}:{{ .tag }}
+          {{- end }}
+          ports:
+            - name: {{ .name }}-port
+              containerPort: {{ .port }}
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .port }}
+            failureThreshold: 5
+            periodSeconds: 10
+
+          startupProbe:
+            httpGet:
+              path: /
+              port: {{ .port }}
+            failureThreshold: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .port }}
+            initialDelaySeconds: 30
+            periodSeconds: 5
+
+          envFrom:
+            - configMapRef:
+                name: {{ .name }}-config
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /data
+            - name: transcode
+              mountPath: /transcode
+      volumes:
+        {{- with .persistence }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .config.claim }}
+        - name: media
+          persistentVolumeClaim:
+            claimName: {{ .media.claim }}
+        - name: transcode
+          persistentVolumeClaim:
+            claimName: {{ .transcode.claim }}
+        {{- end }}
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+{{- end }}

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pms-media
+  namespace: plex
+  labels:
+    storage: plexmedia
+spec:
+  capacity:
+    storage: 5Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.50.1.50
+    path: /kube/plexmedia
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pms-media
+  namespace: plex
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Ti
+  storageClassName: ""
+  selector:
+    matchLabels:
+      storage: plexmedia

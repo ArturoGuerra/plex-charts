@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pms-config
+data:
+  PLEX_UID: "911"
+  PLEX_GID: "1002"
+  TZ: "America/Mexico_City"
+  HOSTNAME: "mandalore"

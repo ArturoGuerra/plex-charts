@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+        - name: {{ .Values.name }}
+          {{- with .Values.image }}
+          image: {{ printf "%s:%s" .repository .tag }}
+          {{- end }}
+          ports:
+            - name: container-web
+              containerPort: {{ .Values.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.config.name }}
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /media
+              name: media
+            - mountPath: /downloads
+              name: downloads
+      volumes:
+        {{- with .Values.persistence }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .config.claim }}
+        - name: media
+          persistentVolumeClaim:
+            claimName: {{ .media.claim }}
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: {{ .downloads.claim }}
+        {{- end }}
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"

@@ -1,0 +1,26 @@
+name: tautulli
+port: 8181
+
+image:
+  repository: linuxserver/tautulli
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  host: "tautulli.arturonet.com"
+
+config:
+  name: tautulli-config
+
+
+persistence:
+  config:
+    create: false
+    claim: tautulli

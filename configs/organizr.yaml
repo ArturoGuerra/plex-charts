@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: organizr-config
+data:
+  PGID: "1000"
+  PUID: "1000"

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deluge
+  namespace: plex
+  labels:
+    app: deluge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deluge
+  template:
+    metadata:
+      namespace: plex
+      labels:
+        app: deluge
+    spec:
+      containers:
+        - name: deluge
+          image: linuxserver/deluge
+          ports:
+            - name: web-interface
+              containerPort: 8112
+            - name: daemon-port
+              containerPort: 58846
+            - name: conn-udp
+              containerPort: 58946
+              protocol: UDP
+          envFrom:
+            - configMapRef:
+                name: deluge
+          volumeMounts:
+            - name: cfg
+              mountPath: "/config"
+            - name: downloads
+              mountPath: "/downloads"
+      volumes:
+        - name: cfg
+          persistentVolumeClaim:
+            claimName: deluge
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: pms-downloads
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"

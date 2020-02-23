@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: synclounge
+  namespace: plex
+  labels:
+    app: synclounge
+spec:
+  type: LoadBalancer
+  ports:
+    - name: web
+      port: 8088
+      targetPort: 8088
+      protocol: TCP
+    - name: server
+      port: 8089
+      targetPort: 8089
+      protocol: TCP
+  selector:
+    app: synclounge
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synclounge
+  namespace: plex
+  labels:
+    app: synclounge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: synclounge
+  template:
+    metadata:
+      namespace: plex
+      labels:
+        app: synclounge
+    spec:
+      containers:
+        - name: synclounge
+          image: starbix/synclounge
+          ports:
+            - name: slweb
+              containerPort: 8088
+            - name: slserver
+              containerPort: 8089
+          env:
+            - name: DOMAIN
+              value: sl.arturonet.com
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"

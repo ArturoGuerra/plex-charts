@@ -1,0 +1,17 @@
+{{- with .Values.persistence.config }}
+{{- if .create }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .claim }}
+spec:
+  accessModes:
+    - {{ .accessMode }}
+  resources:
+    requests:
+      storage: {{ .storage }}
+  {{- if .classname }}
+  storageClassName: {{ .classname }}
+  {{- end }}
+{{- end }}
+{{- end }}
